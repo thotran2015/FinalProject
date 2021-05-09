@@ -23,7 +23,7 @@ import time
 import soundfile as sf
 import sounddevice as sd
 from kivy.graphics import Rectangle, Color
-
+from midi_player import run_midi_player
 
 
 class LeapProcess:
@@ -48,6 +48,7 @@ class LeapProcess:
                     self.thread_queue.put('stop')
                     self.state = 'stop'
 
+
 class MetronomeWidget(Widget):
     def __init__(self, dur, pulsing):
         Widget.__init__(self)
@@ -56,24 +57,10 @@ class MetronomeWidget(Widget):
         self.pulsing = pulsing
         self.pulse_schedule = None
         self.button = Button(size_hint=(None, None), text='blob', font_size=32, background_color=[1, 0, 0, 1])
-        #if self.pulsing:
-            #pass
-        #else:
-            # with self.canvas:
-            #     Color(0, 0, 1)
-            #     self.block = Rectangle(size_hint=(None, None))
         with self.canvas:
             Color(0, 0, 1)
             self.block = Rectangle(size_hint=(None, None))
-
-            #self.bind(pos=self.update_rect, size=self.update_rect)
-        # if self.pulsing:
-        #     self.pulse_schedule = None
-        # else:
-        #     self.button = Button(size_hint=(None, None), text='blob', font_size=32, background_color=[1, 0, 0, 1])
-        #     self.add_widget(self.button)
-
-        #self.add_widget(self.dropdown.mainbutton)
+        self.accomp_file = None
 
         # Leap Variables
         self.controller = Leap.Controller()
@@ -117,19 +104,25 @@ class MetronomeWidget(Widget):
             if self.state == 'start' and not self.is_running:
                 print('Metronome Starts')
                 t_avg, bpm = record_process_signal()
+                if self.accomp_file:
+                    run_midi_player(self.accomp_file, bpm, 'piano', self.controller)
+
+
                 # time.sleep(2*t_avg)
                 Animation.cancel_all(self)
                 self.dur = float(round(t_avg, 2))
-                print(self.pulsing)
                 if self.pulsing:
-                    #self.canvas.clear()
+                    self.canvas.clear()
                     self.pulse_schedule = Clock.schedule_interval(self.blink_square, self.dur)
                 else:
                     self.animation = Animation(pos=(700, 0), duration=0.98 * self.dur) \
                                      + Animation(pos=(0, 0), duration=0.98 * self.dur)
                     self.animation.repeat = True
+                    self.canvas.clear()
+                    with self.canvas:
+                        Color(0, 0, 1)
+                        self.block = Rectangle(size_hint=(None, None))
                     self.animation.start(self.block)
-                    #self.animation.start(self.button)
 
                 self.click_schedule = Clock.schedule_interval(self.play_click, self.dur)
                 self.is_running = True
@@ -157,9 +150,6 @@ class MetronomeApp(App):
     def build(self):
         self.title = 'Metronome'
         print('Start the metronome by pinch!')
-        #dropdown = CustomDropDown()
-        #return dropdown
-        #return dropdown.vis_dropdown
         return MetronomeWidget(self.duration, self.is_pulsing)
 
 

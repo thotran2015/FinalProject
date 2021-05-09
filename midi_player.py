@@ -30,19 +30,19 @@ def play_midi_at_tempo(midi_file, bpm, instrument_to_exclude):
     score = converter.parse(midi_file)
     new_score = stream.Score()
     score_list = list(score)
-    #score_list[3].show('midi')
+    # score_list[3].show('midi')
     for part in score:
-        #part.show('midi')
-        #print(part.getInstrument().)
-        #if part.getInstrument().midiProgram != 0:
+        # part.show('midi')
+        # print(part.getInstrument().)
+        # if part.getInstrument().midiProgram != 0:
         if part.getInstrument().instrumentName != None and part.getInstrument().instrumentName != instrument_to_exclude:
             if part.getInstrument().instrumentName == 'Mandolin':
                 part.insert(0, instrument.StringInstrument())
-                #part.insert(0, volume.Volume(velocity=40))
+                # part.insert(0, volume.Volume(velocity=40))
 
             if part.getInstrument().instrumentName == 'Fretless Bass':
                 part.insert(0, instrument.FretlessBass())
-                #part.insert(0, volume.Volume(velocity=90))
+                # part.insert(0, volume.Volume(velocity=90))
 
             if part.getInstrument().instrumentName == 'Alto':
                 part.insert(0, instrument.Flute())
@@ -57,9 +57,11 @@ def play_midi_at_tempo(midi_file, bpm, instrument_to_exclude):
             new_score.append(part)
     new_score.write('midi', fp=bridge_temp_file)
 
+
 play_midi_at_tempo(bridge_midi, 80, 'Piano')
 
-def play_music(midi_filename, controller):
+
+def play_music(midi_filename, controller=None, stop=None):
     '''Stream music_file in a blocking manner'''
     clock = pygame.time.Clock()
     pygame.mixer.music.load(midi_filename)
@@ -68,47 +70,67 @@ def play_music(midi_filename, controller):
     time.sleep(1)
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
-        frame = controller.frame()
-        hand = frame.hands[0]
-        print('Make a fist to stop. Pinch strength: ', hand.grab_strength)
-        if hand.grab_strength == 1:
+        if controller:
+            frame = controller.frame()
+            hand = frame.hands[0]
+            print('Make a fist to stop. Pinch strength: ', hand.grab_strength)
+            if hand.grab_strength == 1:
+                pygame.mixer.music.stop()
+        if stop:
             pygame.mixer.music.stop()
         clock.tick(1)  # check if playback has finished
 
 
-instruments = ['Piano', 'Cello']
+def run_midi_player(bridge_midi, bpm, instrument, controller):
+    play_midi_at_tempo(bridge_midi, bpm, instrument)
+    # listen for interruptions
+    try:
+        # use the midi file you just saved
+        play_music(bridge_temp_file, controller=controller)
+    except KeyboardInterrupt:
+        # if user hits Ctrl/C then exit
+        # (works only in console mode)
+        pygame.mixer.music.fadeout(1000)
+        pygame.mixer.music.stop()
+        raise SystemExit
+    else:
+        time.sleep(0.5)
 
-if len(sys.argv) != 2:
-    raise ValueError('Error! Enter the instrument after filename in command. \n e.g. python midi_player.py Piano')
 
-i = sys.argv[1]
-if i in instruments:
-    print('Your instrument: ', i)
-    controller = Leap.Controller()
-    while True:
-        frame = controller.frame()
-        hand = frame.hands[0]
-        print('Start the metronome by pinch!')
-        print('Pinch strength: ', hand.pinch_strength)
-        if hand.pinch_strength == 1:
-            T_avg, bpm = record_process_signal()
-            print('Input BPM: ', bpm)
-            play_midi_at_tempo(bridge_midi, bpm, i)
-            # listen for interruptions
-            try:
-                # use the midi file you just saved
-                play_music(bridge_temp_file, controller)
-            except KeyboardInterrupt:
-                # if user hits Ctrl/C then exit
-                # (works only in console mode)
-                pygame.mixer.music.fadeout(1000)
-                pygame.mixer.music.stop()
-                raise SystemExit
-        else:
-            time.sleep(0.5)
-else:
-    msg = 'Instrument not in midi. Give an instrument name from ' + str(instruments)
-    raise ValueError(msg)
+if __name__ == '__main__':
+    instruments = ['Piano', 'Cello']
+
+    if len(sys.argv) != 2:
+        raise ValueError('Error! Enter the instrument after filename in command. \n e.g. python midi_player.py Piano')
+
+    i = sys.argv[1]
+    if i in instruments:
+        print('Your instrument: ', i)
+        controller = Leap.Controller()
+        while True:
+            frame = controller.frame()
+            hand = frame.hands[0]
+            print('Start the metronome by pinch!')
+            print('Pinch strength: ', hand.pinch_strength)
+            if hand.pinch_strength == 1:
+                T_avg, bpm = record_process_signal()
+                print('Input BPM: ', bpm)
+                play_midi_at_tempo(bridge_midi, bpm, i)
+                # listen for interruptions
+                try:
+                    # use the midi file you just saved
+                    play_music(bridge_temp_file, controller)
+                except KeyboardInterrupt:
+                    # if user hits Ctrl/C then exit
+                    # (works only in console mode)
+                    pygame.mixer.music.fadeout(1000)
+                    pygame.mixer.music.stop()
+                    raise SystemExit
+            else:
+                time.sleep(0.5)
+    else:
+        msg = 'Instrument not in midi. Give an instrument name from ' + str(instruments)
+        raise ValueError(msg)
 
 # n = note.Note("D#3")
 # n.duration.type = 'whole'
