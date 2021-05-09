@@ -105,28 +105,28 @@ class MetronomeWidget(Widget):
                 print('Metronome Starts')
                 t_avg, bpm = record_process_signal()
                 if self.accomp_file:
-                    run_midi_player(self.accomp_file, bpm, 'piano', self.controller)
-
-
-                # time.sleep(2*t_avg)
-                Animation.cancel_all(self)
-                self.dur = float(round(t_avg, 2))
-                if self.pulsing:
-                    self.canvas.clear()
-                    self.pulse_schedule = Clock.schedule_interval(self.blink_square, self.dur)
+                    run_midi_player(self.accomp_file, bpm, 'Piano', self.controller)
+                    self.state = 'stop'
                 else:
-                    self.animation = Animation(pos=(700, 0), duration=0.98 * self.dur) \
-                                     + Animation(pos=(0, 0), duration=0.98 * self.dur)
-                    self.animation.repeat = True
-                    self.canvas.clear()
-                    with self.canvas:
-                        Color(0, 0, 1)
-                        self.block = Rectangle(size_hint=(None, None))
-                    self.animation.start(self.block)
+                    # time.sleep(2*t_avg)
+                    Animation.cancel_all(self)
+                    self.dur = float(round(t_avg, 2))
+                    if self.pulsing:
+                        self.canvas.clear()
+                        self.pulse_schedule = Clock.schedule_interval(self.blink_square, self.dur)
+                    else:
+                        self.animation = Animation(pos=(700, 0), duration=0.98 * self.dur) \
+                                         + Animation(pos=(0, 0), duration=0.98 * self.dur)
+                        self.animation.repeat = True
+                        self.canvas.clear()
+                        with self.canvas:
+                            Color(0, 0, 1)
+                            self.block = Rectangle(size_hint=(None, None))
+                        self.animation.start(self.block)
 
-                self.click_schedule = Clock.schedule_interval(self.play_click, self.dur)
-                self.is_running = True
-                print('Metronome is running. To stop, make a fist!')
+                    self.click_schedule = Clock.schedule_interval(self.play_click, self.dur)
+                    self.is_running = True
+                    print('Metronome is running. To stop, make a fist!')
             elif self.state == 'stop' and self.is_running:
                 print('Metronome Stopped')
                 if self.pulsing:

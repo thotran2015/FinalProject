@@ -48,25 +48,6 @@ class CustomDropDown(Widget):
         self.vis_dropdown.bind(on_select=lambda instance, x: setattr(self.mainbutton, 'text', x))
         self.add_widget(self.mainbutton)
 
-class Tab(Widget):
-    def __init__(self):
-        Widget.__init__(self)
-        self.tabs = TabbedPanel()
-        # Settings for the Tab Panel
-        self.tabs.tab_width *= 2.7
-        self.tabs.tab_height *= 2
-        # Metronome Tab
-        self.tabs.default_tab_text = 'IM: Moving Block'
-        self.tabs.default_tab.font_size = 24
-        self.tabs.default_tab_content = CustomDropDown()
-
-        # Accompaniment Tab
-        self.tab1 = TabbedPanelHeader(text='IM: Accompaniment', font_size=24)
-        self.tab1.content = CustomDropDown().mainbutton
-
-        self.tabs.add_widget(self.tab1)
-        self.add_widget(self.tabs)
-
 
 # create App class
 class TabbedPanelApp(App):
@@ -85,7 +66,7 @@ class TabbedPanelApp(App):
 
     def build(self):
         # Add a button
-        self.build_config_menu()
+        self.build_app_layout()
         vis_dropdown = DropDown()
         popup_layout = self.build_popup_layout(vis_dropdown)
         self.popup = Popup(title='Metronome Settings', content=popup_layout,
@@ -98,12 +79,13 @@ class TabbedPanelApp(App):
 
     def update(self, *args):
         self.mode = self.tempo_vis_button.text
-        if self.file_chooser.placeholder_file.text == 'No file selected':
+        self.selected_file = self.file_chooser.selected_file
+        print(self.selected_file)
+        if self.selected_file == 'No file selected':
             self.accomp = False
         else:
             self.accomp = True
 
-        self.selected_file = self.file_chooser.placeholder_file.text
         if 'midi' in self.selected_file:
             self.metronome.accomp_file = self.selected_file
         self.accomp_feedback.text = 'Accomp: %s' % self.accomp
@@ -117,9 +99,8 @@ class TabbedPanelApp(App):
         is_pulsed, vis_text = is_pulsing(self.mode)
         self.metronome.pulsing = is_pulsed
         self.viz_feedback.text = vis_text
-        print('Pulsing:', is_pulsing(self.mode))
 
-    def build_config_menu(self):
+    def build_app_layout(self):
         top_row = GridLayout(cols=3, size_hint_y=0.2)
         self.viz_feedback = Label(text='Tempo Viz: %s' % self.mode, font_size=24)
         self.accomp_feedback = Label(text='Accomp: %s' % self.accomp, font_size=24)
@@ -131,39 +112,38 @@ class TabbedPanelApp(App):
         top_row.add_widget(self.accomp_feedback)
         top_row.add_widget(self.config_button)
         self.layout.add_widget(top_row)
-
         self.layout.add_widget(self.metronome)
-
 
     def build_popup_layout(self, vis_dropdown):
         # Configuration Feature
         popup_layout = GridLayout(cols=1, padding=5)
         self.close_button = Button(text="Close", size_hint_y=0.2, font_size=24)
-
         config_layout = GridLayout(cols=2)
         # Add dropdown
-        vis_opts = AnchorLayout(anchor_x='center', anchor_y='center')
-
+        #vis_opts = AnchorLayout(anchor_x='center', anchor_y='center')
+        vis_opts = GridLayout(cols=1, padding=(30, 0, 30, 95))
         for vis_opt in ['Moving Block', 'Pulsing']:
             btn = Button(text=vis_opt, height=40, size_hint_y=None, font_size=24)
             btn.bind(on_release=lambda b: vis_dropdown.select(b.text))
             vis_dropdown.add_widget(btn)
         # create a big main button
-        self.tempo_vis_button = Button(text='Tempo Visual', font_size=24, size_hint=(0.9, None))
+        self.tempo_vis_button = Button(text='Moving Block', font_size=24, size_hint=(0.7, None))
         self.tempo_vis_button.bind(on_release=vis_dropdown.open)
         vis_dropdown.bind(on_select=lambda instance, x: setattr(self.tempo_vis_button, 'text', x))
 
+        vis_opts.add_widget(Label(text='Select Tempo Visual', font_size=24))
         vis_opts.add_widget(self.tempo_vis_button)
         config_layout.add_widget(vis_opts)
+
         # Add checkbox, Label and Widget
-        acc_check = GridLayout(cols=1)
-        selector_label = Label(text='Accompaniment', font_size=24, size_hint=(0.5, 0.5))
+        acc_check = GridLayout(cols=1, padding=(20, 15, 20, 95))
+        selector_label = Label(text='Accompaniment', font_size=25)
         file_selector = self.file_chooser.overview_layout
 
         acc_check.add_widget(selector_label)
         acc_check.add_widget(file_selector)
         config_layout.add_widget(acc_check)
-        # Add 2nd and 3rd item
+        # Add 1st and 2nd item
         popup_layout.add_widget(config_layout)
         popup_layout.add_widget(self.close_button)
         return popup_layout
@@ -176,3 +156,23 @@ class TabbedPanelApp(App):
     # run the App
 if __name__ == '__main__':
     TabbedPanelApp().run()
+
+
+    # class Tab(Widget):
+    #     def __init__(self):
+    #         Widget.__init__(self)
+    #         self.tabs = TabbedPanel()
+    #         # Settings for the Tab Panel
+    #         self.tabs.tab_width *= 2.7
+    #         self.tabs.tab_height *= 2
+    #         # Metronome Tab
+    #         self.tabs.default_tab_text = 'IM: Moving Block'
+    #         self.tabs.default_tab.font_size = 24
+    #         self.tabs.default_tab_content = CustomDropDown()
+    #
+    #         # Accompaniment Tab
+    #         self.tab1 = TabbedPanelHeader(text='IM: Accompaniment', font_size=24)
+    #         self.tab1.content = CustomDropDown().mainbutton
+    #
+    #         self.tabs.add_widget(self.tab1)
+    #         self.add_widget(self.tabs)
