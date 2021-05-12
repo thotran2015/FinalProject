@@ -13,18 +13,25 @@ kivy.require('1.0.7')
 
 from kivy.animation import Animation
 from kivy.app import App
-from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
 import Leap
 import fluidsynth
-from record import record_process_signal
+from record import record_process_signal, record_signal
 import time
 import soundfile as sf
 import sounddevice as sd
 from kivy.graphics import Rectangle, Color
 from midi_player import run_midi_player
+from kivy.uix.label import Label
+from kivy.core.window import Window
 
+BLOCK_COLOR = (244/255, 175/255, 27/255, 1)
+    #(244/255, 159/255, 28/255, 1)
+    #(1, 1, 0, 1)
+BG_COLOR = (0/255, 21/255, 79/255, 1)
+    #(0, 0, 1, 1)
+TEXT_COLOR = (242/255, 188/255, 148/255, 1)
 
 class LeapProcess:
     def __init__(self, thread_queue):
@@ -38,7 +45,6 @@ class LeapProcess:
             hand = frame.hands[0]
             if not self.thread_queue.empty():
                 continue
-            # print(hand.grab_strength)
             if self.state == 'stop':
                 if hand.pinch_strength == 1:
                     self.thread_queue.put('start')
@@ -56,11 +62,15 @@ class MetronomeWidget(Widget):
         self.mode = 'Moving Block'
         self.pulsing = pulsing
         self.pulse_schedule = None
-        self.button = Button(size_hint=(None, None), text='blob', font_size=32, background_color=[1, 0, 0, 1])
+        self.text_feedback_label = Label(text='Welcome to Intuitive Metronome (IM)!', font_size=26,
+                                         bold=True, pos=(350, 300), color=TEXT_COLOR)
+        self.text_feedback = 'Welcome to Intuitive Metronome (IM)!'
+        self.add_widget(self.text_feedback_label)
         with self.canvas:
-            Color(0, 0, 1)
+            Color(BLOCK_COLOR[0], BLOCK_COLOR[1], BLOCK_COLOR[2], BLOCK_COLOR[3])
             self.block = Rectangle(size_hint=(None, None))
         self.accomp_file = None
+        self.accomp_playing = False
 
         # Leap Variables
         self.controller = Leap.Controller()
@@ -71,70 +81,103 @@ class MetronomeWidget(Widget):
         self.state = 'stop'
         self.is_running = False
         self.stop_time = None
+        self.my_recording = []
+        self.gave_recording_feedback = False
+        Clock.schedule_interval(self.update_label, 0.5)
         Clock.schedule_interval(self.on_update, 1)
+
+    def update_label(self, *args):
+        self.text_feedback_label.text = self.text_feedback
 
     def play_click(self, dt=None):
         sd.play(self.data, self.fs)
 
     def blink_square(self, dt=None):
         with self.canvas:
-            Color(0, 0, 1)
-            Rectangle(size=(900, 700))
-            #self.block.size = (900, 700)
+            Color(BLOCK_COLOR[0], BLOCK_COLOR[1], BLOCK_COLOR[2], BLOCK_COLOR[3])
+            flash = Rectangle(size=(900, 700))
 
         def reset_blink(*args):
-            self.canvas.clear()
+            self.canvas.remove(flash)
 
-        Clock.schedule_once(reset_blink)
+        Clock.schedule_once(reset_blink, self.dur*0.5)
 
     def process_leap(self):
         frame = self.controller.frame()
-        hand = frame.hands[0]
+        self.hand = frame.hands[0]
         if self.state == 'start':
-            if hand.grab_strength == 1:
+            if self.hand.grab_strength == 1:
                 self.state = 'stop'
         elif self.state == 'stop':
-            print('Looking for pinch to start: pinch strength is ', hand.pinch_strength)
-            if hand.pinch_strength == 1:
+            print('Looking for pinch to start: pinch strength is ', self.hand.pinch_strength)
+            self.text_feedback = 'Looking for pinch to start: pinch strength is %s' % round(self.hand.pinch_strength, 2)
+            if self.hand.pinch_strength == 1:
                 self.state = 'start'
 
     def on_update(self, *args):
         if (self.stop_time is None) or (time.time() - self.stop_time > 3):
-            self.process_leap()
+            if self.gave_recording_feedback:
+                pass
+            else:
+                self.process_leap()
             if self.state == 'start' and not self.is_running:
-                print('Metronome Starts')
-                t_avg, bpm = record_process_signal()
+                print('Metronome has started. It is listening for input tempo.')
                 if self.accomp_file:
-                    run_midi_player(self.accomp_file, bpm, 'Piano', self.controller)
-                    self.state = 'stop'
+                    self.text_feedback = 'Listening for input tempo. May take awhile to load MIDI file.'
                 else:
-                    # time.sleep(2*t_avg)
+                    self.text_feedback = 'Metronome has started. It is listening for input tempo.'
+
+                if not self.gave_recording_feedback:
+                    self.gave_recording_feedback = True
+                else:
+                    t_avg, bpm = record_process_signal()
+                    self.gave_recording_feedback = False
+                    #t_avg, bpm = 0.46, 128
+                    if self.accomp_file and not self.accomp_playing:
+                        #self.text_feedback = 'Playing MIDI file at your tempo, %s BPM.' % bpm
+                        self.py_game = run_midi_player(self.accomp_file, bpm, 'Piano', self.controller)
+                        self.accomp_playing = True
+
                     Animation.cancel_all(self)
                     self.dur = float(round(t_avg, 2))
                     if self.pulsing:
-                        self.canvas.clear()
+                        self.canvas.remove(self.block)
+                        self.block = None
                         self.pulse_schedule = Clock.schedule_interval(self.blink_square, self.dur)
                     else:
                         self.animation = Animation(pos=(700, 0), duration=0.98 * self.dur) \
                                          + Animation(pos=(0, 0), duration=0.98 * self.dur)
                         self.animation.repeat = True
-                        self.canvas.clear()
-                        with self.canvas:
-                            Color(0, 0, 1)
-                            self.block = Rectangle(size_hint=(None, None))
+                        if self.block is None:
+                            with self.canvas:
+                                Color(BLOCK_COLOR[0], BLOCK_COLOR[1], BLOCK_COLOR[2], BLOCK_COLOR[3])
+                                self.block = Rectangle(size_hint=(None, None))
                         self.animation.start(self.block)
 
                     self.click_schedule = Clock.schedule_interval(self.play_click, self.dur)
                     self.is_running = True
-                    print('Metronome is running. To stop, make a fist!')
+                    if self.accomp_playing:
+                        self.text_feedback = 'Playing MIDI file at your tempo, %s BPM. To stop, make a fist - %s' % (round(bpm), round(self.hand.grab_strength, 2))
+                    else:
+                        self.text_feedback = 'Metronome is running. To stop, make a fist! Fist strength: %s' % round(self.hand.grab_strength, 2)
+                    print('Metronome is running. To stop, make a fist! Fist strength: %s' % round(self.hand.grab_strength, 2))
             elif self.state == 'stop' and self.is_running:
-                print('Metronome Stopped')
+                print('Metronome has stopped')
+                self.text_feedback = 'Metronome has stopped.'
+                if self.accomp_playing:
+                    self.py_game.mixer.music.stop()
+                    self.accomp_playing = False
+                    self.accomp_file = None
+
                 if self.pulsing:
-                    self.pulse_schedule.cancel()
+                    if self.pulse_schedule:
+                        self.pulse_schedule.cancel()
                 else:
-                    self.animation.stop(self.block)
-                    self.animation.repeat = False
-                self.click_schedule.cancel()
+                    if self.animation:
+                        self.animation.stop(self.block)
+                        self.animation.repeat = False
+                if self.click_schedule:
+                    self.click_schedule.cancel()
                 self.is_running = False
                 self.stop_time = time.time()
         else:
@@ -144,12 +187,12 @@ class MetronomeWidget(Widget):
 class MetronomeApp(App):
     def __init__(self, duration, is_pulsing):
         App.__init__(self)
+        Window.clearcolor = BG_COLOR
         self.duration = duration
         self.is_pulsing = is_pulsing
 
     def build(self):
         self.title = 'Metronome'
-        print('Start the metronome by pinch!')
         return MetronomeWidget(self.duration, self.is_pulsing)
 
 
