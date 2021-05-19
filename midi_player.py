@@ -18,6 +18,8 @@ bridge_temp_file = '/tmp/music21/bridge_v1.mid'
 
 data, fs = sf.read('click.wav', dtype='float32')
 
+load_data, load_fs = sf.read('loading.wav', dtype='float32')
+
 # mixer config
 freq = 44100  # audio CD quality
 bitsize = -16  # unsigned 16 bit
@@ -29,8 +31,9 @@ pygame.mixer.init(freq, bitsize, channels, buffer)
 def play_midi_at_tempo(midi_file, bpm, instrument_to_exclude):
     score = converter.parse(midi_file)
     new_score = stream.Score()
-    score_list = list(score)
+    #score_list = list(score)
     # score_list[3].show('midi')
+    instruments = []
     for part in score:
         # part.show('midi')
         # print(part.getInstrument().)
@@ -47,7 +50,7 @@ def play_midi_at_tempo(midi_file, bpm, instrument_to_exclude):
             if part.getInstrument().instrumentName == 'Alto':
                 part.insert(0, instrument.Flute())
 
-            print(part.getInstrument().instrumentName, part.getInstrument().midiProgram)
+            #print(part.getInstrument().instrumentName, part.getInstrument().midiProgram)
             for element in part.flat:
                 if isinstance(element, tempo.MetronomeMark):
                     print('Original tempo: ', element.number)
@@ -55,46 +58,56 @@ def play_midi_at_tempo(midi_file, bpm, instrument_to_exclude):
                     element.number *= gain
                     print('New tempo: ', element.number)
             new_score.append(part)
+
+            instruments.append(part.getInstrument().instrumentName)
+
     new_score.write('midi', fp=bridge_temp_file)
 
+    instruments.append(instrument_to_exclude)
+    return instruments
 
-play_midi_at_tempo(bridge_midi, 80, 'Piano')
+
+
+#play_midi_at_tempo(bridge_midi, 80, 'Piano')
 
 
 def play_music(midi_filename, controller=None, stop=None):
     '''Stream music_file in a blocking manner'''
+    sd.play(load_data, load_fs)
     clock = pygame.time.Clock()
     pygame.mixer.music.load(midi_filename)
     '''Play a lead-in click'''
     sd.play(data, fs)
     time.sleep(1)
     pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy():
-        if controller:
-            frame = controller.frame()
-            hand = frame.hands[0]
-            print('Make a fist to stop. Pinch strength: ', hand.grab_strength)
-            if hand.grab_strength == 1:
-                pygame.mixer.music.stop()
-        if stop:
-            pygame.mixer.music.stop()
-        clock.tick(1)  # check if playback has finished
+    return pygame
+    # while pygame.mixer.music.get_busy():
+    #     if controller:
+    #         frame = controller.frame()
+    #         hand = frame.hands[0]
+    #         print('Make a fist to stop. Pinch strength: ', hand.grab_strength)
+    #         if hand.grab_strength == 1:
+    #             pygame.mixer.music.stop()
+    #     if stop:
+    #         pygame.mixer.music.stop()
+    #     clock.tick(1)  # check if playback has finished; play the next frame
 
 
 def run_midi_player(bridge_midi, bpm, instrument, controller):
-    play_midi_at_tempo(bridge_midi, bpm, instrument)
+    score_ins = play_midi_at_tempo(bridge_midi, bpm, instrument)
+    print('Score instruments: ', score_ins)
     # listen for interruptions
     try:
         # use the midi file you just saved
-        play_music(bridge_temp_file, controller=controller)
+        return play_music(bridge_temp_file, controller=controller)
     except KeyboardInterrupt:
         # if user hits Ctrl/C then exit
         # (works only in console mode)
         pygame.mixer.music.fadeout(1000)
         pygame.mixer.music.stop()
         raise SystemExit
-    else:
-        time.sleep(0.5)
+    # else:
+    #     time.sleep(0.5)
 
 
 if __name__ == '__main__':

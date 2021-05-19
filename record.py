@@ -22,7 +22,17 @@ def extract_feature_signal(sound_array, hop_size, window_size):
     return fea_signal
         
 
-
+def record_signal(fs=44100, duration=5):
+    # def callback(indata, outdata, frames, time, status):
+    #     if status:
+    #         print(status)
+    #     outdata[:] = indata
+    #
+    # with sd.Stream(channels=2, callback=callback):
+    #     #sd.sleep(int(duration * fs))
+    #     sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    return myrecording
 
 def record_process_signal(hop_size = 1024, window_size = 2048):
     fs = 44100
@@ -30,11 +40,10 @@ def record_process_signal(hop_size = 1024, window_size = 2048):
     duration = 5  # seconds
     print('Metronome Starts RECORDING')
     myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    #sd.wait()
+    sd.wait()
     #sd.play(myrecording, fs)
-
-    time.sleep(duration)
-    sd.stop()
+    #time.sleep(duration)
+    #sd.stop()
     
     # Reshape signal to get signal as 1D array
     sound_array = myrecording.reshape(myrecording.shape[0])
@@ -51,23 +60,23 @@ def record_process_signal(hop_size = 1024, window_size = 2048):
     
     # Plot original and processed signal
 
-    # plt.figure(0)
-    # plt.plot(np.arange(len(sound_array))/fs, sound_array, label = 'original')
-    # plt.title('Original Signal')
-    # plt.legend()
-    # plt.show()
-    #
-    # plt.figure(1)
-    # plt.plot(np.arange(len(sqr_sound))*hop_size/fs, sqr_sound, label = 'feature')
-    #
-    # plt.plot(enf_time, delta_sound, label = 'delta')
-    # plt.title('Processed Signal')
-    # plt.legend()
-    # plt.show()
+    plt.figure(0)
+    plt.plot(np.arange(len(sound_array))/fs, sound_array, label = 'original')
+    plt.title('Original Signal')
+    plt.legend()
+    plt.show()
+
+    plt.figure(1)
+    plt.plot(np.arange(len(sqr_sound))*hop_size/fs, sqr_sound, label = 'feature')
+
+    plt.plot(enf_time, delta_sound, label = 'delta')
+    plt.title('Processed Signal')
+    plt.legend()
+    plt.show()
 
     
     # Detect peaks in the processed sound signal
-    peaks = detect_peaks(delta_sound, show = False, mph = 0.05*max(delta_sound), mpd = 4)
+    peaks = detect_peaks(delta_sound, show=True, mph = 0.05*max(delta_sound), mpd = 4)
     peaks_time = [enf_time[i] for i in peaks]
     
     

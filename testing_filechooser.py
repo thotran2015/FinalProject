@@ -16,6 +16,7 @@ class FileSelector(GridLayout):
         self.overview_layout = GridLayout(rows=2)
         self.selected_file = 'No file selected'
         self.placeholder_file = Label(text='No file selected', font_size=24)
+        #self.instrument_holder = Button(text='Instrument')
         file_upload_btn = Button(text='Choose a file', font_size=24, size_hint_y=0.5)
 
         popup_layout = GridLayout(cols=1)
@@ -40,6 +41,7 @@ class FileSelector(GridLayout):
         file_upload_btn.bind(on_press=self.on_button_press)
 
         self.overview_layout.add_widget(self.placeholder_file)
+        #self.overview_layout.add_widget(self.instrument_holder)
         self.overview_layout.add_widget(file_upload_btn)
 
     def update_file_list_entry(self, file_chooser, file_list_entry, *args):

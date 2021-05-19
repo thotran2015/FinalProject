@@ -1,1 +1,2 @@
-# FinalProject
+# Intuitive Metronome
+## Setup 
