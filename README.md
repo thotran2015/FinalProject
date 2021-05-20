@@ -33,19 +33,15 @@ with the rest of the instruments at their own pace.
 2. Download or git clone this repo.
 3. IM needs Python 3.5 to run. To simplify the setup process,
    I bundle Python 3.5 and all the dependencies 
-   in one conda environment called py35.
+   into one conda environment called py35.
    Set up the conda environment py35 using the instructions [below](#setup).
 4. If you don't have Linux, please recompile LeapPython for Python 3.5 
    on your OS. Instructions for recompiling LeapPython is under
-   Recompiling LeapPython for Python 3.5.
+   [Recompiling LeapPython for Python 3.5](#Recompiling LeapPython for Python 3.5).
    Note: This process is tedious and requires swig (version 3.0.3) and clang++. 
    This recompiling process is NOT recommended unless you 
    absolutely have no access to Linux.
-
-[comment]: <> (Create a conda environment from the environment.yml file. Instructions)
-
-[comment]: <> (on how to do this step are [here]&#40;https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file&#41;)
-
+   
 ### Setup
 Create a conda environment from the py35.yml file.
 ```
@@ -64,18 +60,7 @@ python menu.py
 If you run the code in PyCharm,
 make sure to configure Python interpreter to Python 3.5(py35).
 
-[comment]: <> (### Installing)
-
-[comment]: <> (All the dependencies you will need are listed in )
-
-[comment]: <> (requirement.txt. Install the dependencies using Pip:)
-
-[comment]: <> (```)
-
-[comment]: <> (pip install -r requirements.txt)
-
-[comment]: <> (```)
-### Code
+## Code
 * **menu.py** is the main that you will run to start up the IM app.
 * **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
    * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
@@ -95,7 +80,7 @@ It loads and processes a given midi file. It can adjust the
   midi files, save them to this folder. 
   
   
-### Recompiling LeapPython for Python 3.5
+## Recompiling LeapPython for Python 3.5
 ```
 # 1) Download Leapmotion SDK 
 # 2) Copy Leap.h, LeapMath.h, Leap.i, and libLeap.dylib into one folder.
