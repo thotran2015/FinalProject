@@ -43,14 +43,23 @@ pip install -r requirements.txt
 * **menu.py** is the main that you will run to start up the IM app.
 * **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
    * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
-   on your OS. Instructions for recompiling LeapPython is here.
+   on your OS. Instructions for recompiling LeapPython is [here](#Recompiling LeapPython for Python 3.5).
 * **animation.py** contains the metronome widget and app without any menu or navigation UI.
 * **testing_filechooser.py** has the filechooser widget 
   for the accompaniment feature.
 * **backup** is a folder containing backup copies of
   LeapPython.so and libLeap.dylib that were compiled for Python 3.5 on Linux.
-* **midi_player** is a folder   
-
+* **midi_player.py** contains code for the accompaniment feature. 
+It loads and processes a given midi file. It can adjust the 
+  tempo based on the input tempo. Also, it can exclude one 
+  instrument from a midi file to simulate the accompaniment of 
+  that instrument.
+* **midi_files** is a folder with some sample midi files that you can
+  use to test out the accompaniment feature. To use your own 
+  midi files, save them to this folder. 
+  
+  
+### Recompiling LeapPython for Python 3.5
 ```
 # 1) Download Leapmotion SDK 
 # 2) Copy Leap.h, LeapMath.h, Leap.i, and libLeap.dylib into one folder.
@@ -58,7 +67,6 @@ pip install -r requirements.txt
 swig -c++ -python -o LeapPython.cpp -interface LeapPython Leap.i
 # 4) Compile and link 
 clang++ -arch x86_64 -I/Users/iwatobipen/.pyenv/versions/anaconda-2.4.0/include/python3.5 LeapPython.cpp libLeap.dylib /Users/iwatobipen/.pyenv/versions/anaconda-3.5.0/lib/libpython2.7.dylib -shared -o LeapPython.so
-
 ```
   
 
