@@ -43,7 +43,7 @@ pip install -r requirements.txt
 * **menu.py** is the main that you will run to start up the IM app.
 * **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
    * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
-   on your OS. Instructions for recompiling LeapPython is under [Recompiling LeapPython for Python 3.5](# Recompiling LeapPython for Python 3.5).
+   on your OS. Instructions for recompiling LeapPython is under [Recompiling LeapPython for Python 3.5](# recompiling-leappython-for-python-3.5).
 * **animation.py** contains the metronome widget and app without any menu or navigation UI.
 * **testing_filechooser.py** has the filechooser widget 
   for the accompaniment feature.
