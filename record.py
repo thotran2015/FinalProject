@@ -35,7 +35,7 @@ def record_signal(fs=44100, duration=5):
     myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     return myrecording
 
-def record_process_signal(hop_size = 2048, window_size = 4096, plot_signal=True):
+def record_process_signal(hop_size = 2048, window_size = 4096, plot_signal=False):
     fs = 44100
 
     duration = 5  # seconds

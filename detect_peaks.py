@@ -173,16 +173,16 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
             ax.legend(loc='best', framealpha=.5, numpoints=1)
             #Annotate peaks
             bar_y = max(x[ind][0], x[ind][1])
-            ax.annotate("", ha='center', va='top',
-                        xy=(ind[0], bar_y), xytext=(ind[1], bar_y),
-                        arrowprops=dict(arrowstyle="<->",
-                                        connectionstyle="bar,fraction=0.5",
-                                        ec="k",
-                                        #shrinkA=5, shrinkB=5
-                                        ),
-                        )
-            ax.text(ind[0] + 0.5*(ind[1]-ind[0]), min(bar_y*1.55, max(x[ind])), 'Period', rotation=0,
-                    fontsize=12, ha='center', va='top')
+            # ax.annotate("", ha='center', va='top',
+            #             xy=(ind[0], bar_y), xytext=(ind[1], bar_y),
+            #             arrowprops=dict(arrowstyle="<->",
+            #                             #connectionstyle="bar,fraction=0.6",
+            #                             ec="k",
+            #                             #shrinkA=5, shrinkB=5
+            #                             ),
+            #             )
+            # ax.text(ind[0] + 0.5*(ind[1]-ind[0]), min(bar_y*1.1, max(x[ind])), 'Period', rotation=0,
+            #         fontsize=12, ha='center', va='top')
 
         ax.set_xlim(-.02*x.size, x.size*1.02-1)
         ymin, ymax = x[np.isfinite(x)].min(), x[np.isfinite(x)].max()
