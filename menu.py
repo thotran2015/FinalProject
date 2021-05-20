@@ -26,17 +26,11 @@ from kivy.clock import Clock
 from testing_filechooser import FileSelector
 from kivy.core.window import Window
 from animation import BG_COLOR, TEXT_COLOR
-#(249, 56, 0)
-#CONFIGURE_COLOR = (249/255, 56/255, 0/255, 1)
-CONFIGURE_COLOR = (1, 0, 0, 1)
-#TabbedPanelItem,
-# Floatlayout allows us to place the elements
-# relatively based on the current window
-# size and height especially in mobiles
 from kivy.uix.floatlayout import FloatLayout
 
+CONFIGURE_COLOR = (1, 0, 0, 1)  # red
 
-# Create Tabbed class
+
 class CustomDropDown(Widget):
     # Dropdown Variables
     def __init__(self, options=['Moving Block', 'Pulsing']):
@@ -71,14 +65,11 @@ class TabbedPanelApp(App):
         self.file_chooser = FileSelector()
         Clock.schedule_interval(self.update, 1)
 
-
     def build(self):
-        # Add a button
-        #self.build_app_layout()
         self.vis_dropdown = DropDown()
         popup_layout = self.build_popup_layout(self.vis_dropdown)
         self.config_popup = Popup(title='Metronome Settings', content=popup_layout,
-                      size_hint=(None, None), size=(700, 500), title_size=24)
+                                  size_hint=(None, None), size=(700, 500), title_size=24)
         # Attach close button press with popup.dismiss action
         self.close_button.bind(on_press=self.config_popup.dismiss)
         self.build_app_layout()
@@ -108,7 +99,6 @@ class TabbedPanelApp(App):
         is_pulsed, vis_text = is_pulsing(self.mode)
         self.metronome.pulsing = is_pulsed
         self.viz_feedback.text = vis_text
-
 
     def build_app_layout(self):
         top_row = GridLayout(cols=3, size_hint_y=0.2)
@@ -163,6 +153,7 @@ class TabbedPanelApp(App):
     def onButtonPress(self, button):
         self.config_popup.open()
 
-    # run the App
+
+# run the App
 if __name__ == '__main__':
     TabbedPanelApp().run()

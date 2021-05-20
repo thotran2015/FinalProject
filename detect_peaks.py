@@ -171,6 +171,19 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
             ax.plot(ind, x[ind], '+', mfc=None, mec='r', mew=2, ms=8,
                     label='%d %s' % (ind.size, label))
             ax.legend(loc='best', framealpha=.5, numpoints=1)
+            #Annotate peaks
+            bar_y = max(x[ind][0], x[ind][1])
+            ax.annotate("", ha='center', va='top',
+                        xy=(ind[0], bar_y), xytext=(ind[1], bar_y),
+                        arrowprops=dict(arrowstyle="<->",
+                                        connectionstyle="bar,fraction=0.5",
+                                        ec="k",
+                                        #shrinkA=5, shrinkB=5
+                                        ),
+                        )
+            ax.text(ind[0] + 0.5*(ind[1]-ind[0]), min(bar_y*1.55, max(x[ind])), 'Period', rotation=0,
+                    fontsize=12, ha='center', va='top')
+
         ax.set_xlim(-.02*x.size, x.size*1.02-1)
         ymin, ymax = x[np.isfinite(x)].min(), x[np.isfinite(x)].max()
         yrange = ymax - ymin if ymax > ymin else 1
@@ -178,8 +191,10 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
         ax.set_xlabel('Data #', fontsize=14)
         ax.set_ylabel('Amplitude', fontsize=14)
         mode = 'Valley detection' if valley else 'Peak detection'
-        ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
-                     % (mode, str(mph), mpd, str(threshold), edge))
+        # ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
+        #              % (mode, str(mph), mpd, str(threshold), edge))
+        ax.set_title('Peaks in Processed Signal', fontsize=14)
+
         # plt.grid()
         plt.show()
         
