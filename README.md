@@ -30,20 +30,56 @@ with the rest of the instruments at their own pace.
    Position the Leap sensor in front of your keyboard 
    and run through a couple of the pre-packaged demos to 
    make sure things are working properly.
-2. Make sure you have Python 3.5 because you will need 
-   Python 3.5 to run IM. 
-3. Download or git clone this repo. 
-### Installing
-All the dependencies you will need are listed in 
-requirement.txt. Install the dependencies using Pip:
+2. Download or git clone this repo.
+3. IM needs Python 3.5 to run. To simplify the setup process,
+   I bundle Python 3.5 and all the dependencies 
+   in one conda environment called py35.
+   Set up the conda environment py35 using the instructions [below](#setup).
+4. If you don't have Linux, please recompile LeapPython for Python 3.5 
+   on your OS. Instructions for recompiling LeapPython is under
+   Recompiling LeapPython for Python 3.5.
+   Note: This process is tedious and requires swig (version 3.0.3) and clang++. 
+   This recompiling process is NOT recommended unless you 
+   absolutely have no access to Linux.
+
+[comment]: <> (Create a conda environment from the environment.yml file. Instructions)
+
+[comment]: <> (on how to do this step are [here]&#40;https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file&#41;)
+
+### Setup
+Create a conda environment from the py35.yml file.
 ```
-pip install -r requirements.txt
+conda env create -f py35.yml
 ```
+This environment contains Python 3.5 and all the dependencies for this project. 
+To activate the environment py35: 
+```
+conda activate py35
+```
+Once in this environment, you can run
+the following command in your terminal to start the IM app:
+```
+python menu.py
+```
+If you run the code in PyCharm,
+make sure to configure Python interpreter to Python 3.5(py35).
+
+[comment]: <> (### Installing)
+
+[comment]: <> (All the dependencies you will need are listed in )
+
+[comment]: <> (requirement.txt. Install the dependencies using Pip:)
+
+[comment]: <> (```)
+
+[comment]: <> (pip install -r requirements.txt)
+
+[comment]: <> (```)
 ### Code
 * **menu.py** is the main that you will run to start up the IM app.
 * **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
    * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
-   on your OS. Instructions for recompiling LeapPython is under [Recompiling LeapPython for Python 3.5](# recompiling-leappython-for-python-3.5).
+   on your OS. Instructions for recompiling LeapPython is under Recompiling LeapPython for Python 3.5.
 * **animation.py** contains the metronome widget and app without any menu or navigation UI.
 * **testing_filechooser.py** has the filechooser widget 
   for the accompaniment feature.
@@ -66,7 +102,8 @@ It loads and processes a given midi file. It can adjust the
 # 3) Generate LeapPython.cpp with the following command: 
 swig -c++ -python -o LeapPython.cpp -interface LeapPython Leap.i
 # 4) Compile and link 
-clang++ -arch x86_64 -I/Users/iwatobipen/.pyenv/versions/anaconda-2.4.0/include/python3.5 LeapPython.cpp libLeap.dylib /Users/iwatobipen/.pyenv/versions/anaconda-3.5.0/lib/libpython2.7.dylib -shared -o LeapPython.so
+clang++ -arch x86_64 -I ${CONDA_PREFIX}/include/python* LeapPython.cpp
+ libLeap.dylib ${CONDA_PREFIX}/lib/libpython*.dylib -shared -o LeapPython.so
 ```
   
 
