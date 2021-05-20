@@ -37,7 +37,7 @@ with the rest of the instruments at their own pace.
    Set up the conda environment py35 using the instructions [below](#setup).
 4. If you don't have Linux, please recompile LeapPython for Python 3.5 
    on your OS. Instructions for recompiling LeapPython is under
-   [Recompiling LeapPython for Python 3.5](#Recompiling-LeapPython-for-Python-3.5).
+   [Recompiling LeapPython for Python 3.5](#recompiling-leappython-for-python-35).
    Note: This process is tedious and requires swig (version 3.0.3) and clang++. 
    This recompiling process is NOT recommended unless you 
    absolutely have no access to Linux.
