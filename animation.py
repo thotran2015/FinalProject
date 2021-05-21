@@ -141,8 +141,9 @@ class MetronomeWidget(Widget):
                     Animation.cancel_all(self)
                     self.dur = float(round(t_avg, 2))
                     if self.pulsing:
-                        self.canvas.remove(self.block)
-                        self.block = None
+                        if self.block:
+                            self.canvas.remove(self.block)
+                            self.block = None
                         self.pulse_schedule = Clock.schedule_interval(self.blink_square, self.dur)
                     else:
                         self.animation = Animation(pos=(700, 0), duration=0.98 * self.dur) \
