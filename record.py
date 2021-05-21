@@ -62,34 +62,37 @@ def record_process_signal(hop_size = 2048, window_size = 4096, plot_signal=False
         delta_sound.append(max(sqr_sound[i+1] - sqr_sound[i], 0))
 
     # Plot original and processed signal
-    show_peaks = False
-    if plot_signal:
-        fig, axes = plt.subplots(1, 3, figsize=(10, 3))
-        sound_time = np.arange(len(sound_array))/fs
-        axes[0].plot(sound_time, sound_array, label='Raw sound wave')
-        axes[0].set_title('Original Signal', fontsize=14)
-        axes[0].set_ylabel('Amplitude', fontsize=14)
-        axes[0].set_xlabel('Seconds', fontsize=14)
-        axes[0].legend()
-
-        feature_time = np.arange(len(sqr_sound)) * hop_size / fs
-        enf_time = np.arange(len(delta_sound)) * hop_size / fs
-        axes[1].plot(feature_time, sqr_sound, label='Feature')
-        axes[1].plot(enf_time, delta_sound, label='ENF')
-        axes[1].set_title('Processed Signal', fontsize=14)
-        axes[1].set_ylabel('Amplitude', fontsize=14)
-        axes[1].set_xlabel('Seconds', fontsize=14)
-        axes[1].legend()
-
-        show_peaks = True
+    # show_peaks = False
+    # peak_ax = None
+    # if plot_signal:
+    #     fig, axes = plt.subplots(1, 3, figsize=(10, 3))
+    #     sound_time = np.arange(len(sound_array))/fs
+    #     axes[0].plot(sound_time, sound_array, label='Raw sound wave')
+    #     axes[0].set_title('Original Signal', fontsize=14)
+    #     axes[0].set_ylabel('Amplitude', fontsize=14)
+    #     axes[0].set_xlabel('Seconds', fontsize=14)
+    #     axes[0].legend()
+    #
+    #     feature_time = np.arange(len(sqr_sound)) * hop_size / fs
+    #     enf_time = np.arange(len(delta_sound)) * hop_size / fs
+    #     axes[1].plot(feature_time, sqr_sound, label='Feature')
+    #     axes[1].plot(enf_time, delta_sound, label='ENF')
+    #     axes[1].set_title('Processed Signal', fontsize=14)
+    #     axes[1].set_ylabel('Amplitude', fontsize=14)
+    #     axes[1].set_xlabel('Seconds', fontsize=14)
+    #     axes[1].legend()
+    #
+    #     show_peaks = True
+    #     peak_ax = axes[2]
 
     # Detect peaks in the processed sound signal
-    peaks = detect_peaks(delta_sound, show=show_peaks, mph=0.05*max(delta_sound), mpd=4, ax=axes[2])
+    peaks = detect_peaks(delta_sound, show=False, mph=0.05*max(delta_sound), mpd=4)
+    enf_time = np.arange(len(delta_sound)) * hop_size / fs
     peaks_time = [enf_time[i] for i in peaks]
-    fig.tight_layout()
-    fig.savefig('./signal_processing_plots/raw_and_processed_signal.pdf', dpi=300)
-    plt.show()
 
+    # fig.tight_layout()
+    # fig.savefig('./signal_processing_plots/raw_and_processed_signal.pdf', dpi=300)
+    # plt.show()
 
     # Find T_avg by
     #(1) find the delta between two consecutive timestamps in peaks_time

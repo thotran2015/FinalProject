@@ -10,8 +10,8 @@ from record import record_process_signal
 import soundfile as sf
 import sounddevice as sd
 
-environment.set('midiPath', '/usr/bin/timidity')
-environment.set('musicxmlPath', '/usr/bin/musescore3')
+# environment.set('midiPath', '/usr/bin/timidity')
+# environment.set('musicxmlPath', '/usr/bin/musescore3')
 
 bridge_midi = './midi_files/BridgeOverTroubledWater.mid'
 bridge_temp_file = '/tmp/music21/bridge_v1.mid'
