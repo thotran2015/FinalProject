@@ -41,6 +41,21 @@ with the rest of the instruments at their own pace.
    Note: This process is tedious and requires swig (version 3.0.3) and clang++. 
    This recompiling process is NOT recommended unless you 
    absolutely have no access to Linux.
+5. You will need to install libsdl-mixer1.2 for Pygame. 
+   Pygame uses an older version of libsdl-mixer, so I could not get it via conda.
+   On Linux, use sudo apt to install libsdl-mixer1.2:
+   ```
+    sudo apt-get install libsdl-mixer1.2 
+   ```
+   On Mac, use brew (Note: the version on brew is 1.2.15,
+   so I think it should work. However, I have not tried this):
+   ```
+    brew install sdl
+   ```
+
+
+   
+   
    
 ### Setup
 Create a conda environment from the py35.yml file.
