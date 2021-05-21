@@ -35,8 +35,8 @@ with the rest of the instruments at their own pace.
    I bundle Python 3.5 and all the dependencies 
    into one conda environment called py35.
    Set up the conda environment py35 using the instructions [below](#setup).
-4. If you don't have Linux, please recompile LeapPython for Python 3.5 
-   on your OS. Instructions for recompiling LeapPython is under
+4. If you don't have Linux, please recompile LeapPython for Python 3.5
+   in the environment py35. Instructions for recompiling LeapPython is under
    [Recompiling LeapPython for Python 3.5](#recompiling-leappython-for-python-35).
    Note: This process is tedious and requires swig (version 3.0.3) and clang++. 
    This recompiling process is NOT recommended unless you 
@@ -61,24 +61,28 @@ If you run the code in PyCharm,
 make sure to configure Python interpreter to Python 3.5(py35).
 
 ## Code
+The main code files are described here. If a file is in the repo but is not described here, 
+it probably is not super relevant to the current features of the system.
 * **menu.py** is the main that you will run to start up the IM app.
-* **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
-   * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
-   on your OS. Instructions for recompiling LeapPython is under Recompiling LeapPython for Python 3.5.
 * **animation.py** contains the metronome widget and app without any menu or navigation UI.
-* **testing_filechooser.py** has the filechooser widget 
-  for the accompaniment feature.
-* **backup** is a folder containing backup copies of
-  LeapPython.so and libLeap.dylib that were compiled for Python 3.5 on Linux.
+* **record.py** is the file that records and process tempo input from users.
+* **detect_peaks.py** contains the function that detects peaks in processed signal.
 * **midi_player.py** contains code for the accompaniment feature. 
 It loads and processes a given midi file. It can adjust the 
   tempo based on the input tempo. Also, it can exclude one 
   instrument from a midi file to simulate the accompaniment of 
   that instrument.
+* **testing_filechooser.py** has the filechooser widget 
+  for the accompaniment feature.
+* **backup** is a folder containing backup copies of
+  LeapPython.so and libLeap.dylib that were compiled for Python 3.5 on Linux.
 * **midi_files** is a folder with some sample midi files that you can
   use to test out the accompaniment feature. To use your own 
-  midi files, save them to this folder. 
-  
+  midi files, save them to this folder.
+* **LeapPython.so** is a compiled file of LeapPython module for Python 3.5 and Linux. 
+   * Note: If you don't have Linux, please recompile LeapPython for Python 3.5 
+   on your OS. Instructions for recompiling LeapPython is under Recompiling LeapPython for Python 3.5.
+* **Leap.py** contains Leap SDK functions that return hand positions, pinch/grab strength, etc.
   
 ## Recompiling LeapPython for Python 3.5
 ```
